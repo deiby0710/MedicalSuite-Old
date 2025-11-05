@@ -113,6 +113,7 @@
                                         <option value="" selected disabled>Seleccione una opción</option>
                                         <option value="CAPITA">CAPITA</option>
                                         <option value="EVENTO">EVENTO</option>
+                                        <option value="EVENTO SIN AUTORIZACIÓN">EVENTO SIN AUTORIZACIÓN</option>
                                         <option value="PGP">PGP</option>
                                         <option value="MIPRES">MIPRES</option>
                                     </select>
@@ -2836,6 +2837,16 @@ function cargarDetallesMedicamento(nombreMedicamento) {
         const eps = document.getElementById('eps').value;
 
         if (selectedValue=='CAPITA'){ 
+            codigomipres.disabled = true;
+            NumAutorizacion.disabled = true;
+            NumValidacionPGP.disabled = true;
+            NumAutorizacionMipres.disabled = true;
+            NumAutorizacionMipres.value = '';
+            NumValidacionPGP.value = '';
+            codigomipres.value = '';
+            NumAutorizacion.value = '';
+        }
+        if (selectedValue=='EVENTO SIN AUTORIZACIÓN'){ 
             codigomipres.disabled = true;
             NumAutorizacion.disabled = true;
             NumValidacionPGP.disabled = true;

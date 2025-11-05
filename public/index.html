@@ -19,23 +19,34 @@
                 <i class="fa-solid fa-right-from-bracket"></i>
             </buttton>
         </div>
-        <div class="d-flex justify-content-center align-items-center flex-grow-1" id="id_formulario_principal">
-            <a id="linkPendientes">
-                <div class="div_hijos d-flex flex-column justify-content-center align-items-center p-5">
-                    <div class="logo-container">
-                        <img src="../img/logo3.png" alt="Vini" class="logo1"> <!-- Logo centrado arriba -->
-                    </div>        
-                </div>
-            </a>
-            <div style="width: 100px;"></div>
-            
-            <a id="linkEntregados">
-                <div class="div_hijos bg-verde d-flex flex-column justify-content-center align-items-center p-5">
-                    <div class="logo-container">
-                        <img src="../img/entregados1.png" alt="Vini" class="logo1"> <!-- Logo centrado arriba -->
+        <div class="d-flex justify-content-center align-items-center flex-grow-1 flex-column" id="id_formulario_principal">
+            <div class="d-flex justify-content-center align-items-center">
+                <a id="linkPendientes">
+                    <div class="div_hijos d-flex flex-column justify-content-center align-items-center p-5">
+                        <div class="logo-container">
+                            <img src="../img/logo3.png" alt="Vini" class="logo1"> <!-- Logo centrado arriba -->
+                        </div>        
                     </div>
-                </div>
-            </a>
+                </a>
+                <div style="width: 100px;"></div>
+                
+                <a id="linkEntregados">
+                    <div class="div_hijos bg-verde d-flex flex-column justify-content-center align-items-center p-5">
+                        <div class="logo-container">
+                            <img src="../img/entregados1.png" alt="Vini" class="logo1"> <!-- Logo centrado arriba -->
+                        </div>
+                    </div>
+                </a>
+            </div>
+            <div>
+                <a id="linkNota">
+                    <div class="bg-verde div_hijos_nota d-flex flex-column justify-content-center align-items-center p-5 mt-5">
+                        <div class="logo-container">
+                            <h5>CONSULTA SANITAS NOTA TECNICA</h5>
+                        </div>
+                    </div>
+                </a>
+            </div>
         </div>
     </div>
 </body>
@@ -56,13 +67,15 @@
     // Obtener los elementos <a> por su id
     const linkPendientes = document.getElementById("linkPendientes");
     const linkEntregados = document.getElementById("linkEntregados");
+    const linkNota = document.getElementById("linkNota");
 
     // Construcción de la query string
     const queryString = `?username=${encodeURIComponent(username)}&sede=${encodeURIComponent(sede)}&role=${encodeURIComponent(role)}`;
     
     // Asignar los enlaces dinámicamente
-    linkPendientes.href = `http://localhost:3000/Pendientes/${queryString}`;
-    linkEntregados.href = `http://localhost:3000/Entregados/${queryString}`;
+    linkPendientes.href = `http://190.147.27.194:7000/Pendientes/${queryString}`;
+    linkEntregados.href = `http://190.147.27.194:7000/Entregados/${queryString}`;
+    linkNota.href = `http://190.147.27.194:7000/nota`;
 
     document.getElementById('logoutButton').addEventListener('click', function() {
         // Hacer una solicitud al servidor para cerrar la sesión

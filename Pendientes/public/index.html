@@ -113,6 +113,7 @@
                                         <option value="" selected disabled>Seleccione una opción</option>
                                         <option value="CAPITA">CAPITA</option>
                                         <option value="EVENTO">EVENTO</option>
+                                        <option value="EVENTO SIN AUTORIZACIÓN">EVENTO SIN AUTORIZACIÓN</option>
                                         <option value="PGP">PGP</option>
                                         <option value="MIPRES">MIPRES</option>
                                     </select>
@@ -321,6 +322,49 @@
             </div>
             <div class="text-center mt-3">
                 <button id="agregar-paciente-btn" class="btn btn-custom">Agregar Paciente</button>
+            </div>
+        </div>
+    </div>
+    <div id="div_actualizar_paciente_EPS" style="display: none;">
+        <h2 id="text_actualizar_paciente_EPS" class="text-center text-dark mb-6 consu" style="display:block; text-shadow: 2px 2px 0px #c49b2c, 
+        4px 4px 0px rgba(0, 0, 0, 0.2); ;font-size: 39px;">Actualizar EPS Paciente</h2>
+        <div id="actualizar_paciente_EPS" class="container mt-3" style="display: block;">
+            <div class="formulario_principal">
+                <div class="row">
+                    <div class="col-md-12">
+                        <table class="w-100">
+                            <thead class="text-dark">
+                                <tr>
+                                    <th class="text-center">Identificación</th>
+                                    <th class="text-center">Nombre del Paciente</th>
+                                    <th class="text-center">EPS</th>
+                                    <th class="text-center">Nueva EPS</th>
+                                </tr>
+                            </thead>
+                            <tbody>
+                                <tr>
+                                    <td><input type="text" class="form-control" id="Aidentificacionn" placeholder="Escribe una identificación"></td>
+                                    <td><input type="text" class="form-control" id="Anombre" readonly></td>
+                                    <td><input type="text" class="form-control" id="Aeps_actual" readonly></td>
+                                        <td>
+                                            <select id="Aepss" name="plan" class="form-control form-eps form-inline-input" required>
+                                                <option value="" selected disabled>Seleccione una opción</option>
+                                                <option value="EMSSANAR EPS SAS">EMSSANAR EPS SAS</option>
+                                                <option value="MALLAMAS EPS">MALLAMAS EPS</option>
+                                                <option value="SANITAS EPS">SANITAS EPS</option>
+                                                <option value="ASMET SALUD EPS">ASMET SALUD EPS</option>
+                                                <option value="SOS SALUD">SOS SALUD</option>
+                                            </select>
+                                        </td>
+                                    </td>
+                                </tr>
+                            </tbody>
+                        </table>
+                    </div>
+                </div>
+                <div class="text-center mt-3">
+                    <button id="actualizar-eps-btn" class="btn btn-custom">Actualizar EPS</button>
+                </div>
             </div>
         </div>
     </div>
@@ -1423,7 +1467,7 @@ if (data.pendientes.length > 0) {
                                         <label><input type="radio" name="razon" value="RECHAZO DOMICILIO Y NO ASISTE"> Paciente rechaza servicio a domicilio y no se presenta en sala</label><br>
                                         <label><input type="radio" name="razon" value="RETIRO EN PUNTO ALTERNO"> Retiro en punto alterno</label><br>
                                         <label><input type="radio" name="razon" value="NUEVA PRESCRIPCIÓN MÉDICA"> Nueva prescripción médica</label><br>
-                                        <label><input type="radio" name="razon" value="PENDIENTE FALLECIÓ O NO VIGENTE"> Pendiente falleció o no vigente</label>
+                                        <label><input type="radio" name="razon" value="PACIENTE FALLECIÓ O NO VIGENTE"> Paciente falleció o no vigente</label>
                                     </div>
                                 `,
                                 icon: "warning",
@@ -1831,7 +1875,82 @@ function mostrarOpciones() {
     });
 
 
-    // BUSCAR POR CEDULA Y DEVUELVE SEDE Y USUARIO
+    // BUSCAR POR CÉDULA Y DEVUELVE PACIENTE Y EPS -----------------------------------------------------------------
+document.getElementById('Aidentificacionn').addEventListener('blur', function () {
+    const identificacion = this.value.trim();
+
+    if (identificacion === '') {
+        document.getElementById('Anombre').value = '';
+        document.getElementById('Aeps_actual').value = '';
+        return;
+    }
+
+    fetch(`/ObtenerPaciente/${identificacion}`)
+        .then(response => {
+            if (!response.ok) throw new Error('Paciente no encontrado');
+            return response.json();
+        })
+        .then(data => {
+            document.getElementById('Anombre').value = data.nombre;
+            document.getElementById('Aeps_actual').value = data.eps;
+        })
+        .catch(error => {
+            document.getElementById('Anombre').value = '';
+            document.getElementById('Aeps_actual').value = '';
+            Swal.fire({
+                title: error.message,
+                text: "Verifica la identificación ingresada",
+                icon: "error"
+            });
+        });
+});
+
+// ACTUALIZAR EPS DEL PACIENTE ---------------------------------------------------------------------------------------------
+document.getElementById('actualizar-eps-btn').addEventListener('click', function () {
+    const identificacion = document.getElementById('Aidentificacionn').value.trim();
+    const nuevaEps = document.getElementById('Aepss').value;
+    console.log(nuevaEps)
+    if (!identificacion || !nuevaEps) {
+        Swal.fire({
+            title: "Completa todos los campos antes de actualizar",
+            icon: "warning"
+        });
+        return;
+    }
+
+    fetch('/ActualizarEpsPaciente', {
+        method: 'POST',
+        headers: { 'Content-Type': 'application/json' },
+        body: JSON.stringify({ identificacion, nuevaEps })
+    })
+        .then(response => response.json())
+        .then(data => {
+            if (data.message === 'EPS actualizada correctamente') {
+                Swal.fire({
+                    title: "Éxito",
+                    text: data.message,
+                    icon: "success"
+                });
+
+                // Limpiar campos
+                document.getElementById('Aidentificacionn').value = '';
+                document.getElementById('Anombre').value = '';
+                document.getElementById('Aeps_actual').value = '';
+                document.getElementById('Aepss').value = '';
+            } else {
+                Swal.fire("Error", data.message, "error");
+            }
+        })
+        .catch(error => {
+            console.error('Error:', error);
+            Swal.fire("Error", "Error al actualizar la EPS", "error");
+        });
+});
+
+
+
+
+    // BUSCAR POR CEDULA Y DEVUELVE SEDE Y USUARIO ---------------------------------------------------------------------------
     document.getElementById('AU_identificacion_buscar').addEventListener('blur', function () {
         const cedula = document.getElementById('AU_identificacion_buscar').value.trim().toUpperCase();
 
@@ -2198,6 +2317,7 @@ document.getElementById('agregar-paciente-btn-1').addEventListener('click', func
             document.getElementById('actualizar_usuario_SU').style.display = 'none';
             // document.getElementById('agregar_medicamento_SU').style.display = 'block';
             document.getElementById('text_actualizar_usuario_SU').style.display = 'none';
+            document.getElementById('div_actualizar_paciente_EPS').style.display = 'block';
             // document.getElementById('text_agregar_medicamento_SU').style.display = 'block';
         });
         document.getElementById('usuarios-btn').addEventListener('click', function() {
@@ -2207,6 +2327,7 @@ document.getElementById('agregar-paciente-btn-1').addEventListener('click', func
             document.getElementById('agregar_usuario').style.display = 'none';
             document.getElementById('pendientesResult').style.display = 'none';
             document.getElementById('result').style.display = 'none';
+            document.getElementById('div_actualizar_paciente_EPS').style.display = 'none';
             document.getElementById('actualizar_usuario_SU').style.display ='block';
             document.getElementById('text_actualizar_usuario_SU').style.display = 'block';
             document.getElementById("texto_principal").innerText = 'Agregar Usuario';
